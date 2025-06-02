@@ -4,6 +4,9 @@
 #include "DreamSequenceSubtitleWorldSubsystem.h"
 #include "Components/DreamSequenceSubtitleWidget.h"
 #include "Components/DreamSequenceSubtitleEntryWidget.h"
+#include "DreamSequenceSubtitleSettings.h"
+
+#define DSS_DEBUG_LOG(V, F, ...) {if (UDreamSequenceSubtitleSettings* Settings = UDreamSequenceSubtitleSettings::Get()) {if (Settings->bEnableDebug){DSS_LOG(V, F, ##__VA_ARGS__)}}}
 
 /* -------------------------------------------------------------------------
  *
@@ -18,7 +21,7 @@ static FSharedPersistentDataKey RegisterDataKey(const FMovieSceneEvaluationOpera
 	if (!OperandMapping.Contains(InOperand))
 	{
 		OperandMapping.Add(InOperand, FMovieSceneSharedDataId::Allocate());
-		DSS_LOG(Log, TEXT("Register Operand %d"), InOperand.SequenceID.GetInternalValue())
+		DSS_DEBUG_LOG(Log, TEXT("Register Operand %d"), InOperand.SequenceID.GetInternalValue())
 	}
 
 	return FSharedPersistentDataKey(OperandMapping[InOperand], InOperand);
@@ -79,7 +82,8 @@ FDreamSequenceSubtitleSectionTemplate::FDreamSequenceSubtitleSectionTemplate(con
 
 void FDreamSequenceSubtitleSectionTemplate::Initialize(const FMovieSceneEvaluationOperand& Operand, const FMovieSceneContext& Context, FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player) const
 {
-	DSS_FLOG(Log, TEXT("Initialize Template"))
+	DSS_DEBUG_LOG(Log, TEXT("Initialize Template"))
+	
 	RegisterDataKey(Operand);
 }
 
@@ -91,7 +95,7 @@ void FDreamSequenceSubtitleSectionTemplate::SetupOverrides()
 void FDreamSequenceSubtitleSectionTemplate::Evaluate(const FMovieSceneEvaluationOperand& Operand, const FMovieSceneContext& Context, const FPersistentEvaluationData& PersistentData, FMovieSceneExecutionTokens& ExecutionTokens) const
 {
 	FMovieSceneSharedDataId ID = GetSharedDataKey(Operand).UniqueId;
-	DSS_FLOG(Log, TEXT("Speaker: %15s Content: %15s"), *Content.Speaker.ToString(), *Content.Content.ToString())
+	DSS_DEBUG_LOG(Log, TEXT("Speaker: %15s Content: %15s"), *Content.Speaker.ToString(), *Content.Content.ToString())
 	const FDreamSequenceSubtitleSharedTrackData* TrackData = PersistentData.Find<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(Operand));
 	if (TrackData && TrackData->HasAnythingToDo() && !ExecutionTokens.FindShared(ID))
 	{
@@ -118,14 +122,14 @@ void FDreamSequenceSubtitleSectionTemplate::Setup(FPersistentEvaluationData& Per
 	if (!GetEntry())
 	{
 		// TODO Entry Added
-		DSS_FLOG(Log, TEXT("Add : Speaker: %s Content: %s"), *Content.Speaker.ToString(), *Content.Content.ToString())
+		DSS_DEBUG_LOG(Log, TEXT("Add : Speaker: %s Content: %s"), *Content.Speaker.ToString(), *Content.Content.ToString())
 		SetEntry(TrackData.AddEntry(Content));
 	}
 }
 
 void FDreamSequenceSubtitleSectionTemplate::TearDown(FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player) const
 {
-	DSS_FLOG(Log, TEXT("Remove : Speaker: %s Content: %s"), *Content.Speaker.ToString(), *Content.Content.ToString())
+	DSS_DEBUG_LOG(Log, TEXT("Remove : Speaker: %s Content: %s"), *Content.Speaker.ToString(), *Content.Content.ToString())
 	FDreamSequenceSubtitleSharedTrackData& TrackData = PersistentData.GetOrAdd<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(SelfOperand));
 	TrackData.SetInfo();
 	TrackData.RemoveEntry(EntryWidget);

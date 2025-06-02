@@ -58,8 +58,12 @@ public:
 	}
 
 	void RefreshView(UWorld* InWorld);
+	void RemoveWidget();
 
 private:
+	UPROPERTY(Transient)
+	TObjectPtr<UWorld> CachedWorld;
+	
 	UDreamSequenceSubtitleWidget* CreateSubtitleWidget(UWorld* InWorld);
 
 #if WITH_EDITOR

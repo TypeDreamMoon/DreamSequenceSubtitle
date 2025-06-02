@@ -33,7 +33,22 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void AddEntryWidgetTo(UDreamSequenceSubtitleEntryWidget* EntryWidget);
 
+	virtual void Activated();
+	virtual void Deactivated();
+
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Activated")
+	void BP_Activated();
+
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Deactivated")
+	void BP_Deactivated();
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnEntryChanged OnEntryChanged;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* Animation_In;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* Animation_Out;
 };

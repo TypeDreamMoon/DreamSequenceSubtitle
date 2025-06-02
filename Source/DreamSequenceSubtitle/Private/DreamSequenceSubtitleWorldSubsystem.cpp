@@ -94,6 +94,7 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 									Widget
 								];
 							}
+							SubtitleWidget->Activated();
 						}
 					}
 				}
@@ -106,35 +107,41 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 					UDreamSequenceSubtitleWidget* Widget = CreateSubtitleWidget(InWorld);
 					SetSubtitleWidget(Widget);
 					GEngine->GameViewport->AddViewportWidgetContent(Widget->TakeWidget());
+					Widget->Activated();
 				}
 			}
 		}
 	}
 	else // Is Not Ref. Remove From Parent
 	{
+		CachedWorld = InWorld;
 		if (SubtitleWidgetIsValid())
 		{
-#if WITH_EDITOR
-			if (GIsEditor && !InWorld->IsPlayInEditor())
-			{
-				SOverlay* Overlay = static_cast<SOverlay*>(ViewportWidget.Pin().Get());
-				if (Overlay)
-				{
-					Overlay->RemoveSlot(GetSubtitleWidget()->TakeWidget());
-				}
-			}
-			else
-#endif
-			{
-				if (GEngine && GEngine->GameViewport)
-				{
-					GetSubtitleWidget()->RemoveFromParent();
-				}
-			}
-
-			SetSubtitleWidget(nullptr);
+			GetSubtitleWidget()->Deactivated();
 		}
 	}
+}
+
+void UDreamSequenceSubtitleWorldSubsystem::RemoveWidget()
+{
+#if WITH_EDITOR
+	if (GIsEditor && !CachedWorld->IsPlayInEditor())
+	{
+		SOverlay* Overlay = static_cast<SOverlay*>(ViewportWidget.Pin().Get());
+		if (Overlay)
+		{
+			Overlay->RemoveSlot(GetSubtitleWidget()->TakeWidget());
+		}
+	}
+	else
+#endif
+	{
+		if (GEngine && GEngine->GameViewport)
+		{
+			GetSubtitleWidget()->RemoveFromParent();
+		}
+	}
+	SetSubtitleWidget(nullptr);
 }
 
 UDreamSequenceSubtitleWidget* UDreamSequenceSubtitleWorldSubsystem::CreateSubtitleWidget(UWorld* InWorld)

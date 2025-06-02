@@ -29,6 +29,19 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Set Speaker Name")
 	void BP_SetDialogueSpeakerName(const FText& InText);
 
-	UFUNCTION(BlueprintNativeEvent)
-	void Deactivate();
+	virtual void Activated();
+	virtual void Deactivated();
+
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Activate")
+	void BP_Activated();
+
+	UFUNCTION(BlueprintNativeEvent, DisplayName = "Deactivate")
+	void BP_Deactivated();
+
+public:
+	UPROPERTY(BlueprintReadOnly, Transient, Meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* Animation_In;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* Animation_Out;
 };
