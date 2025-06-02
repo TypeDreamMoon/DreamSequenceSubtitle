@@ -18,6 +18,11 @@
 			"Name": "DreamSequenceSubtitle",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "DreamSequenceSubtitleEditor",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
 		}
 	]
 }

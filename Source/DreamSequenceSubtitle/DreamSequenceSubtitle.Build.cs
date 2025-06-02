@@ -38,10 +38,23 @@ public class DreamSequenceSubtitle : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"MovieScene",
+				"UMG",
+				"DeveloperSettings"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
-		
+
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"UnrealEd",
+					"EditorStyle",
+					"Settings"
+				});
+		}
 		
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
