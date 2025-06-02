@@ -13,13 +13,18 @@ UDreamSequenceSubtitleWorldSubsystem* UDreamSequenceSubtitleWorldSubsystem::Get(
 	return InWorld->GetSubsystem<UDreamSequenceSubtitleWorldSubsystem>();
 }
 
+void UDreamSequenceSubtitleWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	RefreshView(GetWorld());
+}
+
 void UDreamSequenceSubtitleWorldSubsystem::Deinitialize()
 {
 #if WITH_EDITOR
 	if (GIsEditor && !GWorld->IsPlayInEditor())
 	{
 		SOverlay* Overlay = static_cast<SOverlay*>(ViewportWidget.Pin().Get());
-		if (Overlay)
+		if (Overlay && GetSubtitleWidget())
 		{
 			Overlay->RemoveSlot(GetSubtitleWidget()->TakeWidget());
 		}
@@ -43,7 +48,7 @@ void UDreamSequenceSubtitleWorldSubsystem::SetSubtitleWidget(UDreamSequenceSubti
 	SubtitleWidget = InSubtitleWidget;
 }
 
-bool UDreamSequenceSubtitleWorldSubsystem::SubtitleWidgetIsVaild()
+bool UDreamSequenceSubtitleWorldSubsystem::SubtitleWidgetIsValid()
 {
 	return SubtitleWidget != nullptr;
 }
@@ -52,7 +57,7 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 {
 	if (IsRef())
 	{
-		if (!SubtitleWidgetIsVaild())
+		if (!SubtitleWidgetIsValid())
 		{
 #if WITH_EDITOR // Editor Test Add Subtitle Widget To Editor Viewport
 			if (GIsEditor && !InWorld->IsPlayInEditor())
@@ -75,7 +80,7 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 						if (SceneViewport->GetViewportWidget().IsValid())
 						{
 							// Check Subtitle Widget Is Valid. If not, Create New One.
-							if (!SubtitleWidgetIsVaild())
+							if (!SubtitleWidgetIsValid())
 							{
 								SetSubtitleWidget(CreateSubtitleWidget(InWorld));
 							}
@@ -93,22 +98,21 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 					}
 				}
 			}
-#else // Runtime Add To Viewport
-		if (GEngine && GEngine->GameViewport)
-		{
-			if (!SubtitleWidgetIsVaild())
-			{
-				UDreamSequenceSubtitleWidget* Widget = CreateSubtitleWidget(InWorld);
-				SetSubtitleWidget(Widget);
-				GEngine->GameViewport->AddViewportWidgetContent(Widget->TakeWidget());
-			}
-		}
+			else
 #endif
+			{
+				if (GEngine && GEngine->GameViewport)
+				{
+					UDreamSequenceSubtitleWidget* Widget = CreateSubtitleWidget(InWorld);
+					SetSubtitleWidget(Widget);
+					GEngine->GameViewport->AddViewportWidgetContent(Widget->TakeWidget());
+				}
+			}
 		}
 	}
 	else // Is Not Ref. Remove From Parent
 	{
-		if (SubtitleWidgetIsVaild())
+		if (SubtitleWidgetIsValid())
 		{
 #if WITH_EDITOR
 			if (GIsEditor && !InWorld->IsPlayInEditor())
@@ -119,12 +123,15 @@ void UDreamSequenceSubtitleWorldSubsystem::RefreshView(UWorld* InWorld)
 					Overlay->RemoveSlot(GetSubtitleWidget()->TakeWidget());
 				}
 			}
-#else
-			if (GEngine && GEngine->GameViewport)
-			{
-				GetSubtitleWidget()->RemoveFromParent();
-			}
+			else
 #endif
+			{
+				if (GEngine && GEngine->GameViewport)
+				{
+					GetSubtitleWidget()->RemoveFromParent();
+				}
+			}
+
 			SetSubtitleWidget(nullptr);
 		}
 	}

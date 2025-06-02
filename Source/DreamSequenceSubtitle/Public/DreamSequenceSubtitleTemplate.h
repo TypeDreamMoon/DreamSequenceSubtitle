@@ -34,7 +34,7 @@ private:
 	FMovieSceneEvaluationOperand SelfOperand;
 	FDreamSequenceSubtitleSectionContent Content;
 	UPROPERTY()
-	UDreamSequenceSubtitleEntryWidget* EntryWidget;
+	UDreamSequenceSubtitleEntryWidget* EntryWidget = nullptr;
 };
 
 UENUM()
@@ -45,19 +45,17 @@ enum class EDreamSequenceSubtitleEnvMode
 	WithRuntime = 2,
 };
 
-struct FDreamSequenceSubtitleToken : public IMovieSceneSharedExecutionToken
+struct FDreamSequenceSubtitleToken : public IMovieSceneExecutionToken
 {
 public:
-	FDreamSequenceSubtitleToken(const FMovieSceneEvaluationOperand& InOperand, FDreamSequenceSubtitleSectionTemplate& InTemplate, const FDreamSequenceSubtitleSectionContent& Content);
+	FDreamSequenceSubtitleToken(FDreamSequenceSubtitleSectionTemplate& InTemplate);
 
 public:
-	virtual void Execute(FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player) override;
+	virtual void Execute(const FMovieSceneContext& Context, const FMovieSceneEvaluationOperand& Operand, FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player) override;
 
 public:
 	EDreamSequenceSubtitleEnvMode EnvMode = EDreamSequenceSubtitleEnvMode::None;
 
 private:
-	FMovieSceneEvaluationOperand Operand;
 	FDreamSequenceSubtitleSectionTemplate& Template;
-	FDreamSequenceSubtitleSectionContent Content;
 };

@@ -5,6 +5,7 @@
 #include "DreamSequenceSubtitleTrack.h"
 #include "IDetailCustomization.h"
 #include "DetailLayoutBuilder.h"
+#include "DreamSequenceSubtitleEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "DreamSequenceSubtitleEditor"
 
@@ -36,7 +37,7 @@ bool FDreamSequenceSubtitleEditor::SupportsType(TSubclassOf<UMovieSceneTrack> Ty
 
 const FSlateBrush* FDreamSequenceSubtitleEditor::GetIconBrush() const
 {
-	return FAppStyle::GetBrush("Sequencer.Tracks.LevelVisibility");
+	return FDreamSequenceSubtitleStyle::Get().GetBrush("DreamSequenceSubtitle.Track");
 }
 
 void FDreamSequenceSubtitleEditor::BuildAddTrackMenu(FMenuBuilder& MenuBuilder)
@@ -58,7 +59,7 @@ void FDreamSequenceSubtitleEditor::BuildAddTrackMenu(FMenuBuilder& MenuBuilder)
 TSharedPtr<SWidget> FDreamSequenceSubtitleEditor::BuildOutlinerEditWidget(const FGuid& ObjectBinding, UMovieSceneTrack* Track, const FBuildEditWidgetParams& Params)
 {
 	return FSequencerUtilities::MakeAddButton(
-		LOCTEXT("AddDialogueTrigger", "Add Dialogue"),
+		LOCTEXT("AddSubtitleTrigger", "Add Subtitle"),
 		FOnGetContent::CreateSP(this, &FDreamSequenceSubtitleEditor::BuildAddVisibilityTriggerMenu, Track),
 		Params.NodeIsHovered,
 		GetSequencer());
@@ -128,7 +129,7 @@ void FDreamSequenceSubtitleEditor::BuildTrackContextMenu(FMenuBuilder& MenuBuild
 
 void FDreamSequenceSubtitleEditor::AddNewSection(UMovieScene* MovieScene, UMovieSceneTrack* LevelVisibilityTrack)
 {
-	const FScopedTransaction Transaction(LOCTEXT("AddDialogueSection_Transaction", "Add Dialogue Trigger"));
+	const FScopedTransaction Transaction(LOCTEXT("AddSubtitleSection_Transaction", "Add Subtitle Trigger"));
 	LevelVisibilityTrack->Modify();
 
 	FFrameNumber startSliderTime = MovieScene->GetPlaybackRange().GetLowerBoundValue();
@@ -174,11 +175,11 @@ void FDreamSequenceSubtitleEditor::OnAddTrack()
 		return;
 	}
 
-	const FScopedTransaction Transaction(LOCTEXT("AddDialogueTrack_Transaction", "Add Dialogue Track"));
+	const FScopedTransaction Transaction(LOCTEXT("AddSubtitleTrack_Transaction", "Add Subtitle Track"));
 	FocusedMovieScene->Modify();
 
 	UDreamSequenceSubtitleTrack* NewTrack = FocusedMovieScene->AddTrack<UDreamSequenceSubtitleTrack>();
-	checkf(NewTrack != nullptr, TEXT("Failed to create new dialogue track."));
+	checkf(NewTrack != nullptr, TEXT("Failed to create new subtitle track."));
 
 	GetSequencer()->NotifyMovieSceneDataChanged(EMovieSceneDataChangeType::MovieSceneStructureItemAdded);
 }

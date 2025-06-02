@@ -27,7 +27,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Speaker = LOCTEXT("SpeakerDefaultName", "Speaker");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (MultiLine))
 	FText Content = LOCTEXT("DefaultContent", "Hello World");
 
 	bool operator==(const FDreamSequenceSubtitleSectionContent& Other) const;

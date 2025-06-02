@@ -1,12 +1,14 @@
 ﻿#include "DreamSequenceSubtitleEditorModule.h"
 
 #include "DreamSequenceSubtitleEditor.h"
+#include "DreamSequenceSubtitleEditorStyle.h"
 #include "ISequencerModule.h"
 
 #define LOCTEXT_NAMESPACE "FDreamSequenceSubtitleEditorModule"
 
 void FDreamSequenceSubtitleEditorModule::StartupModule()
 {
+    FDreamSequenceSubtitleStyle::Initialize();
     ISequencerModule& Module = FModuleManager::LoadModuleChecked<ISequencerModule>("Sequencer");
     Handle = Module.RegisterTrackEditor(FOnCreateTrackEditor::CreateStatic(&FDreamSequenceSubtitleEditor::CreateTrackEditor));
 }
@@ -21,6 +23,9 @@ void FDreamSequenceSubtitleEditorModule::ShutdownModule()
     ISequencerModule& Module = FModuleManager::LoadModuleChecked<ISequencerModule>("Sequencer");
 
     Module.UnRegisterTrackEditor(Handle);
+
+    FDreamSequenceSubtitleStyle::Shutdown();
+    
 }
 
 #undef LOCTEXT_NAMESPACE

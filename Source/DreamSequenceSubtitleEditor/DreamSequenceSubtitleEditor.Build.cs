@@ -27,7 +27,8 @@ public class DreamSequenceSubtitleEditor : ModuleRules
                 "SequenceDialogue",
                 "EditorStyle",
                 "UnrealEd",
-                "MovieScene"
+                "MovieScene",
+                "Projects",
             }
         );
     }

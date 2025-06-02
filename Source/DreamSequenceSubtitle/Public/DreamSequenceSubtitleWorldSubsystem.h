@@ -19,6 +19,7 @@ class DREAMSEQUENCESUBTITLE_API UDreamSequenceSubtitleWorldSubsystem : public UW
 public:
 	static UDreamSequenceSubtitleWorldSubsystem* Get(UWorld* InWorld);
 
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 public:
 	UPROPERTY()
@@ -26,7 +27,8 @@ public:
 
 	UDreamSequenceSubtitleWidget* GetSubtitleWidget();
 	void SetSubtitleWidget(UDreamSequenceSubtitleWidget* InSubtitleWidget);
-	bool SubtitleWidgetIsVaild();
+	bool SubtitleWidgetIsValid();
+	
 
 	UPROPERTY()
 	int32 RefCount = 0;

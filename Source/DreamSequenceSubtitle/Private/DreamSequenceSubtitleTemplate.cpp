@@ -5,6 +5,31 @@
 #include "Components/DreamSequenceSubtitleWidget.h"
 #include "Components/DreamSequenceSubtitleEntryWidget.h"
 
+/* -------------------------------------------------------------------------
+ *
+ *		Global Static
+ *
+ * ------------------------------------------------------------------------- */
+
+static TMap<FMovieSceneEvaluationOperand, FMovieSceneSharedDataId> OperandMapping;
+
+static FSharedPersistentDataKey RegisterDataKey(const FMovieSceneEvaluationOperand& InOperand)
+{
+	if (!OperandMapping.Contains(InOperand))
+	{
+		OperandMapping.Add(InOperand, FMovieSceneSharedDataId::Allocate());
+		DSS_LOG(Log, TEXT("Register Operand %d"), InOperand.SequenceID.GetInternalValue())
+	}
+
+	return FSharedPersistentDataKey(OperandMapping[InOperand], InOperand);
+}
+
+static FSharedPersistentDataKey GetSharedDataKey(const FMovieSceneEvaluationOperand& InOperand)
+{
+	RegisterDataKey(InOperand);
+
+	return FSharedPersistentDataKey(OperandMapping[InOperand], InOperand);
+}
 
 /* -------------------------------------------------------------------------
  *
@@ -43,25 +68,6 @@ private:
  *
  * ------------------------------------------------------------------------- */
 
-static TMap<FMovieSceneEvaluationOperand, FMovieSceneSharedDataId> OperandMapping;
-
-static FSharedPersistentDataKey RegisterDataKey(const FMovieSceneEvaluationOperand& InOperand)
-{
-	if (!OperandMapping.Contains(InOperand))
-	{
-		OperandMapping.Add(InOperand, FMovieSceneSharedDataId::Allocate());
-	}
-
-	return FSharedPersistentDataKey(OperandMapping[InOperand], InOperand);
-}
-
-static FSharedPersistentDataKey GetSharedDataKey(const FMovieSceneEvaluationOperand& InOperand)
-{
-	RegisterDataKey(InOperand);
-
-	return FSharedPersistentDataKey(OperandMapping[InOperand], InOperand);
-}
-
 
 FDreamSequenceSubtitleSectionTemplate::FDreamSequenceSubtitleSectionTemplate()
 {
@@ -79,7 +85,7 @@ void FDreamSequenceSubtitleSectionTemplate::Initialize(const FMovieSceneEvaluati
 
 void FDreamSequenceSubtitleSectionTemplate::SetupOverrides()
 {
-	EnableOverrides(RequiresSetupFlag | RequiresTearDownFlag);
+	EnableOverrides(RequiresSetupFlag | RequiresTearDownFlag | RequiresInitializeFlag);
 }
 
 void FDreamSequenceSubtitleSectionTemplate::Evaluate(const FMovieSceneEvaluationOperand& Operand, const FMovieSceneContext& Context, const FPersistentEvaluationData& PersistentData, FMovieSceneExecutionTokens& ExecutionTokens) const
@@ -89,7 +95,7 @@ void FDreamSequenceSubtitleSectionTemplate::Evaluate(const FMovieSceneEvaluation
 	const FDreamSequenceSubtitleSharedTrackData* TrackData = PersistentData.Find<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(Operand));
 	if (TrackData && TrackData->HasAnythingToDo() && !ExecutionTokens.FindShared(ID))
 	{
-		FDreamSequenceSubtitleToken Token = FDreamSequenceSubtitleToken(Operand, const_cast<FDreamSequenceSubtitleSectionTemplate&>(*this), Content);
+		FDreamSequenceSubtitleToken Token = FDreamSequenceSubtitleToken(const_cast<FDreamSequenceSubtitleSectionTemplate&>(*this));
 
 #if WITH_EDITOR
 		if (GIsEditor && !GIsPlayInEditorWorld)
@@ -100,7 +106,7 @@ void FDreamSequenceSubtitleSectionTemplate::Evaluate(const FMovieSceneEvaluation
 		Token.EnvMode = EDreamSequenceSubtitleEnvMode::WithRuntime;
 #endif
 
-		ExecutionTokens.AddShared(ID, Token);
+		ExecutionTokens.Add(Token);
 	}
 }
 
@@ -187,7 +193,7 @@ void FDreamSequenceSubtitleSharedTrackData::Refresh(IMovieScenePlayer& Player)
 void FDreamSequenceSubtitleSharedTrackData::RemoveEntry(UDreamSequenceSubtitleEntryWidget* EntryWidget)
 {
 	UDreamSequenceSubtitleWorldSubsystem* Subsystem = UDreamSequenceSubtitleWorldSubsystem::Get(GWorld);
-	if (EntryWidget && Subsystem->SubtitleWidgetIsVaild())
+	if (EntryWidget && Subsystem->SubtitleWidgetIsValid())
 	{
 		Subsystem->GetSubtitleWidget()->RemoveEntryByWidget(EntryWidget);
 		Subsystem->Release();
@@ -215,12 +221,12 @@ UDreamSequenceSubtitleEntryWidget* FDreamSequenceSubtitleSharedTrackData::AddEnt
  *
  * ------------------------------------------------------------------------- */
 
-FDreamSequenceSubtitleToken::FDreamSequenceSubtitleToken(const FMovieSceneEvaluationOperand& InOperand, FDreamSequenceSubtitleSectionTemplate& InTemplate, const FDreamSequenceSubtitleSectionContent& InContent)
-	: Operand(InOperand), Template(InTemplate), Content(InContent)
+FDreamSequenceSubtitleToken::FDreamSequenceSubtitleToken(FDreamSequenceSubtitleSectionTemplate& InTemplate)
+	: Template(InTemplate)
 {
 }
 
-void FDreamSequenceSubtitleToken::Execute(FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player)
+void FDreamSequenceSubtitleToken::Execute(const FMovieSceneContext& Context, const FMovieSceneEvaluationOperand& Operand, FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player)
 {
 	FDreamSequenceSubtitleSharedTrackData* TrackData = PersistentData.Find<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(Operand));
 	if (TrackData)

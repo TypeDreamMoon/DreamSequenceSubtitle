@@ -14,9 +14,11 @@ public:
 	virtual TSharedRef<SWidget> GenerateSectionWidget() override;
 	virtual int32 OnPaintSection(FSequencerSectionPainter& InPainter) const override;
 	virtual FText GetSectionTitle() const override;
+	virtual float GetSectionHeight(const UE::Sequencer::FViewDensityInfo& ViewDensity) const override;
 
 private:
 	FSlateColor GetBackgroundColor() const;
+	FText GetVisibilitySpeakerText() const;
 	FText GetVisibilityText() const;
 	FText GetVisibilityTooltip() const;
 
