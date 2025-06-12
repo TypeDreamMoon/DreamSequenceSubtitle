@@ -8,7 +8,7 @@
 #include "DreamSequenceSubtitleSettings.h"
 #include "DreamSequenceSubtitleWorldSubsystem.h"
 #include "Animation/UMGSequencePlayer.h"
-#include "Editor/WidgetCompilerLog.h"
+#include "Misc/EngineVersionComparison.h"
 
 void UDreamSequenceSubtitleWidget::RemoveEntryByWidget(UDreamSequenceSubtitleEntryWidget* EntryWidget)
 {
@@ -49,12 +49,19 @@ UDreamSequenceSubtitleEntryWidget* UDreamSequenceSubtitleWidget::AddEntry(FDream
 
 void UDreamSequenceSubtitleWidget::Activated()
 {
-	if (UDreamSequenceSubtitleSettings::Get()->bSubtitleWidgetAnimation)
+	if (UDreamSequenceSubtitleSettings::Get()->bSubtitleWidgetEntryAnimation)
 	{
-		PlayAnimationForward(Animation_In)->OnSequenceFinishedPlaying().AddLambda([this](UUMGSequencePlayer& Player)
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,6,0)
+		PlayAnimationForward(Animation_In).GetAnimationState()->GetOnWidgetAnimationFinished().AddLambda([this](FWidgetAnimationState& State)
 		{
+			BP_Activated();
 		});
-		BP_Activated();
+#else
+		PlayAnimationForward(Animation_In)->OnSequenceFinishedPlaying().AddLambda([this](const UUMGSequencePlayer& Player)
+		{
+			BP_Activated();
+		});
+#endif
 	}
 	else
 	{
@@ -64,12 +71,19 @@ void UDreamSequenceSubtitleWidget::Activated()
 
 void UDreamSequenceSubtitleWidget::Deactivated()
 {
-	if (UDreamSequenceSubtitleSettings::Get()->bSubtitleWidgetAnimation)
+	if (UDreamSequenceSubtitleSettings::Get()->bSubtitleWidgetEntryAnimation)
 	{
-		PlayAnimationForward(Animation_Out)->OnSequenceFinishedPlaying().AddLambda([this](UUMGSequencePlayer& Player)
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,6,0)
+		PlayAnimationForward(Animation_Out).GetAnimationState()->GetOnWidgetAnimationFinished().AddLambda([this](FWidgetAnimationState& State)
 		{
 			BP_Deactivated();
 		});
+#else
+		PlayAnimationForward(Animation_Out)->OnSequenceFinishedPlaying().AddLambda([this](const UUMGSequencePlayer& Player)
+		{
+			BP_Deactivated();
+		});
+#endif
 	}
 	else
 	{
