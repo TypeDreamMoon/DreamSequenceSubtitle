@@ -24,7 +24,6 @@ public class DreamSequenceSubtitleEditor : ModuleRules
                 "SlateCore",
                 "Sequencer",
                 "EditorWidgets",
-                "SequenceDialogue",
                 "EditorStyle",
                 "UnrealEd",
                 "MovieScene",
