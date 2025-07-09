@@ -30,7 +30,7 @@ void UDreamSequenceSubtitleWorldSubsystem::Deinitialize()
 		}
 	}
 #else
-	if (GEngine && GEngine->GameViewport)
+	if (GEngine && GEngine->GameViewport && GetSubtitleWidget())
 	{
 		GetSubtitleWidget()->RemoveFromParent();
 	}
@@ -128,7 +128,7 @@ void UDreamSequenceSubtitleWorldSubsystem::RemoveWidget()
 	if (GIsEditor && !CachedWorld->IsPlayInEditor())
 	{
 		SOverlay* Overlay = static_cast<SOverlay*>(ViewportWidget.Pin().Get());
-		if (Overlay)
+		if (Overlay && GetSubtitleWidget() != nullptr)
 		{
 			Overlay->RemoveSlot(GetSubtitleWidget()->TakeWidget());
 		}
@@ -136,7 +136,7 @@ void UDreamSequenceSubtitleWorldSubsystem::RemoveWidget()
 	else
 #endif
 	{
-		if (GEngine && GEngine->GameViewport)
+		if (GEngine && GEngine->GameViewport && GetSubtitleWidget())
 		{
 			GetSubtitleWidget()->RemoveFromParent();
 		}

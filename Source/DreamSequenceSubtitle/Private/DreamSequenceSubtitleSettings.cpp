@@ -52,3 +52,5 @@ TSubclassOf<UDreamSequenceSubtitleEntryWidget> UDreamSequenceSubtitleSettings::G
 {
 	return SubtitleEntryWidgetClass.LoadSynchronous();
 }
+
+#undef LOCTEXT_NAMESPACE

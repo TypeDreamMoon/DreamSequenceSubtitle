@@ -5,6 +5,7 @@
 #include "Components/DreamSequenceSubtitleWidget.h"
 #include "Components/DreamSequenceSubtitleEntryWidget.h"
 #include "DreamSequenceSubtitleSettings.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #define DSS_DEBUG_LOG(V, F, ...) {if (UDreamSequenceSubtitleSettings* Settings = UDreamSequenceSubtitleSettings::Get()) {if (Settings->bEnableDebug){DSS_LOG(V, F, ##__VA_ARGS__)}}}
 
@@ -78,11 +79,13 @@ FDreamSequenceSubtitleSectionTemplate::FDreamSequenceSubtitleSectionTemplate()
 
 FDreamSequenceSubtitleSectionTemplate::FDreamSequenceSubtitleSectionTemplate(const UDreamSequenceSubtitleSection& Section) : Content(Section.GetContent())
 {
+	if (UDreamSequenceSubtitleSettings::Get()->bEnableDebug)
+		UKismetSystemLibrary::PrintString(GWorld, FString::Printf(TEXT("Initialize Template %s SecC: %s %s"), *Section.GetName(), *Content.Speaker.ToString(), *Content.Content.ToString()), true);
 }
 
 void FDreamSequenceSubtitleSectionTemplate::Initialize(const FMovieSceneEvaluationOperand& Operand, const FMovieSceneContext& Context, FPersistentEvaluationData& PersistentData, IMovieScenePlayer& Player) const
 {
-	DSS_DEBUG_LOG(Log, TEXT("Initialize Template"))
+	DSS_DEBUG_LOG(Log, TEXT("Initialize Template"));
 	
 	RegisterDataKey(Operand);
 }
@@ -118,6 +121,7 @@ void FDreamSequenceSubtitleSectionTemplate::Setup(FPersistentEvaluationData& Per
 {
 	FDreamSequenceSubtitleSharedTrackData& TrackData = PersistentData.GetOrAdd<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(SelfOperand));
 	TrackData.SetInfo();
+	PersistentData.GetOrAddSectionData<>()
 
 	// TODO : Entry Added
 	if (!GetEntry())
@@ -217,6 +221,9 @@ void FDreamSequenceSubtitleSharedTrackData::ResetEntry(FDreamSequenceSubtitleSec
 UDreamSequenceSubtitleEntryWidget* FDreamSequenceSubtitleSharedTrackData::AddEntry(FDreamSequenceSubtitleSectionContent InNewContent) const
 {
 	UDreamSequenceSubtitleWorldSubsystem* Subsystem = UDreamSequenceSubtitleWorldSubsystem::Get(GWorld);
+
+	if (UDreamSequenceSubtitleSettings::Get()->bEnableDebug)
+		UKismetSystemLibrary::PrintString(GWorld, FString::Printf(TEXT("Add : Speaker: %s Content: %s"), *InNewContent.Speaker.ToString(), *InNewContent.Content.ToString()));
 
 	Subsystem->AddRef();
 	UDreamSequenceSubtitleEntryWidget* Widget = Subsystem->GetSubtitleWidget()->AddEntry(InNewContent);

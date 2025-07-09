@@ -7,23 +7,22 @@
 #include "MovieSceneSection.h"
 #include "DreamSequenceSubtitleSection.generated.h"
 
-UCLASS(MinimalAPI)
-class UDreamSequenceSubtitleSection : public UMovieSceneSection
+UCLASS()
+class DREAMSEQUENCESUBTITLE_API UDreamSequenceSubtitleSection : public UMovieSceneSection
 {
 	GENERATED_BODY()
 
 public:
-	FDreamSequenceSubtitleSectionContent GetContent() const
-	{
-		return Content;
-	}
+	FDreamSequenceSubtitleSectionContent GetContent() const;
 
-	void SetContent(const FDreamSequenceSubtitleSectionContent& InContent)
-	{
-		Content = InContent;
-	}
+	void SetContent(const FDreamSequenceSubtitleSectionContent& InContent);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitle")
-	FDreamSequenceSubtitleSectionContent Content;
+	FText Speaker;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitle")
+	FText Content;
+	
+	virtual void Serialize(FArchive& Ar) override;
 };
