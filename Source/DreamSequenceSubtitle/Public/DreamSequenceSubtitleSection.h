@@ -14,7 +14,7 @@ class DREAMSEQUENCESUBTITLE_API UDreamSequenceSubtitleSection : public UMovieSce
 
 public:
 	FDreamSequenceSubtitleSectionContent GetContent() const;
-
+	
 	void SetContent(const FDreamSequenceSubtitleSectionContent& InContent);
 
 public:

@@ -1,6 +1,6 @@
-# Dream Sequence Subtitle - 梦月序列字幕
+# 因设计缺陷 本插件停止更新 您可以使用源插件 https://github.com/jushuai123/SequenceDialogue 本插件只能在Editor模式下运行 打包出来是没有效果的
 
-# 发现一个问题 打包之后无法正常显示字幕 待修复
+# Dream Sequence Subtitle - 梦月序列字幕
 
 ---
 

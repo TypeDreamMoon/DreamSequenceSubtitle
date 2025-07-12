@@ -121,7 +121,7 @@ void FDreamSequenceSubtitleSectionTemplate::Setup(FPersistentEvaluationData& Per
 {
 	FDreamSequenceSubtitleSharedTrackData& TrackData = PersistentData.GetOrAdd<FDreamSequenceSubtitleSharedTrackData>(GetSharedDataKey(SelfOperand));
 	TrackData.SetInfo();
-	PersistentData.GetOrAddSectionData<>()
+	// PersistentData.GetOrAddSectionData<>()
 
 	// TODO : Entry Added
 	if (!GetEntry())
